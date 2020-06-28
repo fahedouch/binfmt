@@ -12,6 +12,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: azure/docker-login@v1
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        with:
+          login-server: index.docker.io
+          username: ${{ secrets.DOCKERIO_USERNAME }}
+          password: ${{ secrets.DOCKERIO_PASSWORD }}
       -
         name: Setup
         run: |
@@ -24,12 +30,6 @@ jobs:
         name: Validate all
         run: |
           ./hack/ci
-      - uses: azure/docker-login@v1
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        with:
-          login-server: index.docker.io
-          username: ${{ secrets.DOCKERIO_USERNAME }}
-          password: ${{ secrets.DOCKERIO_PASSWORD }}
       -
         name: Publish master
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
